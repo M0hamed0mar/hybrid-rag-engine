@@ -1,0 +1,63 @@
+﻿# ============================================================
+# Hybrid RAG Engine - Docker Compose
+# CPU-only deployment
+# ============================================================
+services:
+  rag-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hybrid-rag-engine:latest
+    container_name: hybrid-rag-engine
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      # --- API keys (override via .env file or shell) ---
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:?GOOGLE_API_KEY is required}
+      # --- Server ---
+      HOST: "0.0.0.0"
+      PORT: "8000"
+      DEBUG: "false"
+      # --- OCR ---
+      TESSERACT_CMD: "tesseract"
+      # --- Chunking ---
+      CHUNK_SIZE: "512"
+      CHUNK_OVERLAP: "100"
+      # --- Retrieval ---
+      TOP_K_RETRIEVAL: "10"
+      TOP_K_RERANK: "5"
+      MAX_CONTEXT_TOKENS: "4000"
+
+    volumes:
+      # Persist runtime data (FAISS index, BM25, cache, uploads, logs)
+      - ./data/uploads:/app/data/uploads
+      - ./data/index:/app/data/index
+      - ./data/cache:/app/data/cache
+      - ./data/logs:/app/data/logs
+      # Persist HuggingFace model cache (~500MB, download once)
+      - hf-cache:/home/appuser/.cache/huggingface
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+    # Resource limits (tune for your machine)
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+        reservations:
+          memory: 2G
+
+    # Give time for model loading
+    stop_grace_period: 30s
+
+volumes:
+  hf-cache:
+    driver: local

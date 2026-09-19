@@ -1,0 +1,72 @@
+﻿# ============================================================
+# Docker build context exclusions
+# ============================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+
+# Runtime data (never bake into image)
+data/uploads/*
+data/index/*
+data/cache/*
+data/logs/*
+!data/**/.gitkeep
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs & tests
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation & meta (not needed at runtime)
+docs/
+*.md
+!README.md
+LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+Makefile
+.github/
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose.yml
